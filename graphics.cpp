@@ -1,5 +1,5 @@
 /*                                                                         *
-* Easygl Version 2.0.1                                                     *
+* Easygl Version 2.0.3                                                     *
 * Written by Vaughn Betz at the University of Toronto, Department of       *
 * Electrical and Computer Engineering, with additions by Paul Leventis     *
 * and William Chow of Altera, Guy Lemieux of the University of Brish       *
@@ -10,6 +10,9 @@
 * as long as you leave the author info above in it.                        *
 *                                                                          *
 * Revision History:                                                        *
+*                                                                          *
+* V2.0.3 Sept. 2023 (John Giorshev)                                        *
+* - Added catchall for font loading                                        *
 *                                                                          *
 * V2.0.2 May 2013 - June 2013 (Mike Wang)                                  *
 * - In Win32, removed "Window" operation with right mouse click to align   *
@@ -2788,7 +2791,7 @@ load_font(int pointsize)
 		return;
 
 #ifdef X11
-   #define NUM_FONT_TYPES 3
+   #define NUM_FONT_TYPES 4
    char fontname[NUM_FONT_TYPES][BUFSIZE];
    int ifont;
    bool success = false;
@@ -2801,6 +2804,9 @@ load_font(int pointsize)
    sprintf(fontname[1], "lucidasans-%d", pointsize);
    sprintf(fontname[2],"-schumacher-clean-medium-r-*--*-%d0-*-*-*-*-*-*",
              pointsize);
+   // last fallback is anything that exists on the system
+   fontname[3][0] = '*';
+   fontname[3][1] = '\0';
 	
    for (ifont = 0; ifont < NUM_FONT_TYPES; ifont++) {
 #ifdef VERBOSE
@@ -2820,8 +2826,7 @@ load_font(int pointsize)
       }
    }
    if (!success) {
-      printf ("Error in load_font:  cannot load any font of pointsize %d.\n",
-               pointsize);
+      puts ("Error loading any of the supplied fonts.");
       printf ("Use xlsfonts to list available fonts, and modify load_font\n");
       printf ("in graphics.cpp.\n");
       exit (1);
